@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasterChef English Academy - Animated Edition</title>
+    <style>
+        :root {
+            --chef-red: #d9381e;
+            --mustard-yellow: #f4b21b;
+            --kitchen-dark: #2b2d42;
+            --apron-white: rgba(248, 249, 250, 0.95);
+            --chalkboard: #1e272e;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace, sans-serif;
+            /* Memasukkan aset gambar dapur koki sebagai background */
+            background: url('http://googleusercontent.com/image_generation_content/0') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Overlay gelap agar background tidak merusak keterbacaan teks */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        .restaurant-card {
+            background-color: var(--apron-white);
+            border: 6px double var(--kitchen-dark);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            /* Animasi kartu muncul pertama kali */
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .restaurant-card::before {
+            content: "👨‍🍳";
+            font-size: 50px;
+            position: absolute;
+            top: -40px;
+            left: calc(50% - 25px);
+            background: #f8f9fa;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+
+        h1 {
+            color: var(--chef-red);
+            font-family: 'Georgia', serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            border-bottom: 2px dashed var(--kitchen-dark);
+            padding-bottom: 10px;
+        }
+
+        .menu-subtitle {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* Animasi Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 2px solid var(--kitchen-dark);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--mustard-yellow);
+            width: 10%;
+            transition: width 0.4s ease-in-out;
+        }
+
+        .kitchen-station {
+            display: inline-block;
+            background-color: var(--mustard-yellow);
+            color: var(--kitchen-dark);
+            padding: 6px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border: 2px solid var(--kitchen-dark);
+            box-shadow: 3px 3px 0px var(--kitchen-dark);
+        }
+
+        /* Papan tulis dengan efek animasi fade */
+        .blackboard-order {
+            background-color: var(--chalkboard);
+            color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-bottom: 25px;
+            border: 4px solid #57606f;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+        }
+
+        .anim-fade {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .ingredients-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn-ingredient {
+            background-color: white;
+            border: 2px solid var(--kitchen-dark);
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            color: var(--kitchen-dark);
+            box-shadow: 4px 4px 0px var(--kitchen-dark);
+        }
+
+        .btn-ingredient:hover {
+            background-color: #fffde7;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--kitchen-dark);
+        }
+
+        /* Animasi Tombol Jawaban */
+        .btn-ingredient.correct {
+            background-color: #2ecc71 !important;
+            color: white;
+            border-color: #27ae60;
+            animation: popIn 0.3s ease-in-out;
+        }
+
+        .btn-ingredient.wrong {
+            background-color: var(--chef-red) !important;
+            color: white;
+            border-color: #c0392b;
+            animation: shake 0.3s linear;
+        }
+
+        .kitchen-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed var(--kitchen-dark);
+            font-weight: bold;
+            color: var(--kitchen-dark);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-serve {
+            background-color: var(--kitchen-dark);
+            color: white;
+            border: 2px solid var(--kitchen-dark);
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            box-shadow: 4px 4px 0px var(--mustard-yellow);
+            transition: 0.2s;
+        }
+
+        .btn-serve:hover {
+            background-color: var(--chef-red);
+            transform: scale(1.05);
+        }
+
+        .cooking-effect {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--chef-red);
+            height: 30px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0px var(--mustard-yellow);
+        }
+
+        /* --- ANIMASI KEYFRAMES --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="restaurant-card">
+        <div id="quiz-screen">
+            <h1>MasterChef Academy</h1>
+            <div class="menu-subtitle">~ Today's Order: Flavours & Cooking Verbs ~</div>
+            
+            <div class="progress-container">
+                <div id="p-bar" class="progress-bar"></div>
+            </div>
+
+            <div id="station" class="kitchen-station">STATION: PREPARATION</div>
+            <div id="fx-text" class="cooking-effect">👩‍🍳 Get Ready! 👨‍🍳</div>
+            
+            <div id="order-box" class="blackboard-order">Loading Recipe...</div>
+            
+            <div class="ingredients-grid" id="ingredients-container"></div>
+
+            <div class="kitchen-status">
+                <span id="ticket-number">📋 Ticket: 1/10</span>
+                <span id="kitchen-score">⭐ Tips: $0</span>
+            </div>
+        </div>
+
+        <div id="result-screen" class="hidden">
+            <h1>🍳 Service Completed! 🍳</h1>
+            <p style="font-size: 18px; color: var(--kitchen-dark); font-weight: bold;">The Critic's Review:</p>
+            <div id="final-chalk" class="blackboard-order" style="font-size: 24px; color: var(--mustard-yellow);">
+                Total Tips: $0
+            </div>
+            <p id="chef-grade" style="font-weight: bold; margin: 20px 0; font-size: 18px;"></p>
+            <button class="btn-serve" onclick="restartKitchen()">New Shift (Play Again) 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // Data pertanyaan sama seperti versi sebelumnya
+        const quizData = [
+            { station: "🥣 FLAVOUR STATION", question: "Chef! The soup needs more sugar, right now it is too ______ and not sweet at all.", options: ["🧂 Salty", "🍋 Sour", "🌶️ Spicy", "🌿 Bland"], correct: 1, sfx: "💥 SOUR FACE! 💥" },
+            { station: "🔥 STOVE STATION", question: "Hurry! The oil is hot. ______ the chicken until it turns golden brown!", options: ["🍳 Fry", "💨 Steam", "🥖 Bake", "🍲 Boil"], correct: 0, sfx: "🍳 SIZZLE SIZZLE! 🍳" },
+            { station: "🥣 FLAVOUR STATION", question: "Ugh, you put too much chili in this sauce! It's incredibly ______!", options: ["🍫 Bitter", "🍦 Sweet", "🌶️ Spicy", "🥔 Bland"], correct: 2, sfx: "🥵 TOO HOT! 🥵" },
+            { station: "🔪 PREPARATION STATION", question: "Take the knife and ______ the onions into very small pieces for the sauce.", options: ["💧 Pour", "🔪 Chop", "🔄 Stir", "🍊 Peel"], correct: 1, sfx: "🫱 CHOP CHOP CHOP! 🫱" },
+            { station: "🥣 FLAVOUR STATION", question: "This dark chocolate espresso cake is delicious but has a slightly ______ aftertaste.", options: ["🍯 Sweet", "☕ Bitter", "🧂 Salty", "🍋 Sour"], correct: 1, sfx: "☕ SO INTENSE! ☕" },
+            { station: "🥖 OVEN STATION", question: "Set the oven to 180°C. We are going to ______ a fresh loaf of sourdough bread.", options: ["🪵 Grill", "🔄 Stir", "🥖 Bake", "🍳 Fry"], correct: 2, sfx: "🥖 FRESHLY BAKED! 🥖" },
+            { station: "🥣 FLAVOUR STATION", question: "Forgetful Chef! You forgot to add any spices. This soup tastes totally ______.", options: ["🥔 Bland", "🧀 Savory", "🌶️ Spicy", "🧂 Salty"], correct: 0, sfx: "🥱 SO BORING! 🥱" },
+            { station: "🔪 PREPARATION STATION", question: "Before you slice the potatoes, please ______ the muddy skin off them.", options: ["🔄 Stir", "💧 Pour", "🥣 Mix", "🍊 Peel"], correct: 3, sfx: "🥔 PEELING IT! 🥔" },
+            { station: "🍲 POT STATION", question: "Keep a close eye on the sauce. Use the wooden spoon to ______ it gently so it doesn't stick.", options: ["🔄 Stir", "🍳 Fry", "🥖 Bake", "🔪 Chop"], correct: 0, sfx: "🥄 STIRRING THE POT! 🥄" },
+            { station: "🥣 FLAVOUR STATION", question: "Mmm! This sea salt caramel ice cream has a perfectly balanced ______ and sweet taste.", options: ["🌶️ Spicy", "🍋 Sour", "🧂 Salty", "☕ Bitter"], correct: 2, sfx: "😋 DELICIOUS! 😋" }
+        ];
+
+        let currentOrderIndex = 0;
+        let tipsMoney = 0;
+        let activeService = true;
+
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const stationEl = document.getElementById('station');
+        const fxTextEl = document.getElementById('fx-text');
+        const orderBoxEl = document.getElementById('order-box');
+        const containerEl = document.getElementById('ingredients-container');
+        const ticketEl = document.getElementById('ticket-number');
+        const scoreEl = document.getElementById('kitchen-score');
+        const pBarEl = document.getElementById('p-bar');
+        const finalChalkEl = document.getElementById('final-chalk');
+        const gradeEl = document.getElementById('chef-grade');
+
+        function startOrder() {
+            activeService = true;
+            const order = quizData[currentOrderIndex];
+            
+            // Efek animasi masuk teks baru
+            orderBoxEl.classList.remove('anim-fade');
+            void orderBoxEl.offsetWidth; // Trigger reflow untuk reset animasi
+            orderBoxEl.classList.add('anim-fade');
+
+            stationEl.innerText = order.station;
+            orderBoxEl.innerText = order.question;
+            ticketEl.innerText = `📋 Ticket: ${currentOrderIndex + 1}/${quizData.length}`;
+            scoreEl.innerText = `⭐ Tips: $${tipsMoney}`;
+            
+            // Update bar kemajuan visual
+            const progressPercent = ((currentOrderIndex + 1) / quizData.length) * 100;
+            pBarEl.style.width = `${progressPercent}%`;
+
+            containerEl.innerHTML = '';
+            order.options.forEach((option, idx) => {
+                const button = document.createElement('button');
+                button.classList.add('btn-ingredient');
+                button.innerText = option;
+                button.addEventListener('click', () => checkRecipe(idx, button));
+                containerEl.appendChild(button);
+            });
+        }
+
+        function checkRecipe(selectedIdx, btn) {
+            if (!activeService) return;
+            activeService = false;
+
+            const order = quizData[currentOrderIndex];
+            const allBtns = containerEl.querySelectorAll('.btn-ingredient');
+
+            if (selectedIdx === order.correct) {
+                btn.classList.add('correct');
+                tipsMoney += 10;
+                scoreEl.innerText = `⭐ Tips: $${tipsMoney}`;
+                fxTextEl.innerText = order.sfx;
+            } else {
+                btn.classList.add('wrong');
+                allBtns[order.correct].classList.add('correct');
+                fxTextEl.innerText = "❌ RECIPE RUINED! ❌";
+            }
+
+            setTimeout(() => {
+                currentOrderIndex++;
+                if (currentOrderIndex < quizData.length) {
+                    startOrder();
+                } else {
+                    finishShift();
+                }
+            }, 1600);
+        }
+
+        function finishShift() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            finalChalkEl.innerText = `Total Tips Earned: $${tipsMoney}`;
+
+            if (tipsMoney === 100) {
+                gradeEl.innerHTML = "🏆 3 MICHELIN STARS! 🏆<br>You are a Legendary Head Chef!";
+                gradeEl.style.color = "#2ecc71";
+            } else if (tipsMoney >= 70) {
+                gradeEl.innerHTML = "👨‍🍳 SOUS CHEF RANK 👨‍🍳<br>Great job, the customers loved your food!";
+                gradeEl.style.color = "var(--mustard-yellow)";
+            } else {
+                gradeEl.innerHTML = "🧹 KITCHEN HELPER 🧹<br>Keep practicing! Don't let the kitchen burn next time.";
+                gradeEl.style.color = "var(--chef-red)";
+            }
+        }
+
+        function restartKitchen() {
+            currentOrderIndex = 0;
+            tipsMoney = 0;
+            fxTextEl.innerText = "👩‍🍳 Get Ready! 👨‍🍳";
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            startOrder();
+        }
+
+        startOrder();
+    </script>
+</body>
+</html>
